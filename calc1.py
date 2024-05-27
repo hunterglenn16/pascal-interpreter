@@ -1,7 +1,14 @@
 # Token types
 # EOF (end-of-file) token is used to indicate that
 # there is no more input left for lexical analysis
-INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, EOF = 'INTEGER', 'PLUS', 'MINUS', 'MULTIPLY', 'DIVIDE', 'EOF'
+INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, EOF = (
+    "INTEGER",
+    "PLUS",
+    "MINUS",
+    "MULTIPLY",
+    "DIVIDE",
+    "EOF",
+)
 
 
 class Token(object):
@@ -18,10 +25,7 @@ class Token(object):
             Token(INTEGER, 3)
             Token(PLUS '+')
         """
-        return 'Token({type}, {value})'.format(
-            type=self.type,
-            value=repr(self.value)
-        )
+        return "Token({type}, {value})".format(type=self.type, value=repr(self.value))
 
     def __repr__(self):
         return self.__str__()
@@ -35,7 +39,7 @@ class Interpreter(object):
         self.current_char = self.text[self.pos]
 
     def error(self):
-        raise Exception('Error parsing input')
+        raise Exception("Error parsing input")
 
     def advance_token(self):
         self.pos += 1
@@ -49,7 +53,7 @@ class Interpreter(object):
             self.advance_token()
 
     def integer(self):
-        result = ''
+        result = ""
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self.advance_token()
@@ -63,26 +67,25 @@ class Interpreter(object):
         """
 
         if self.current_char is not None:
-
             if self.current_char.isspace():
                 self.whitespace_skip()
 
             if self.current_char.isdigit():
                 return Token(INTEGER, self.integer())
 
-            if self.current_char == '+':
+            if self.current_char == "+":
                 self.advance_token()
                 return Token(PLUS, self.current_char)
 
-            if self.current_char == '-':
+            if self.current_char == "-":
                 self.advance_token()
                 return Token(MINUS, self.current_char)
 
-            if self.current_char == '*':
+            if self.current_char == "*":
                 self.advance_token()
                 return Token(MULTIPLY, self.current_char)
 
-            if self.current_char == '/':
+            if self.current_char == "/":
                 self.advance_token()
                 return Token(DIVIDE, self.current_char)
 
@@ -128,7 +131,7 @@ class Interpreter(object):
 def main():
     while True:
         try:
-            text = input('calc> ')
+            text = input("calc> ")
         except EOFError:
             break
         if not text:
@@ -138,5 +141,5 @@ def main():
         print(result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
