@@ -66,7 +66,8 @@ class Interpreter(object):
         apart into tokens. One token at a time.
         """
 
-        if self.current_char is not None:
+        while self.current_char is not None:
+
             if self.current_char.isspace():
                 self.whitespace_skip()
 
@@ -90,6 +91,7 @@ class Interpreter(object):
                 return Token(DIVIDE, self.current_char)
 
             self.error()
+        return Token(EOF, None)
 
     def eat(self, token_type):
         if self.current_token.type == token_type:
@@ -97,34 +99,24 @@ class Interpreter(object):
         else:
             self.error()
 
+    def term(self):
+        token = self.current_token
+        self.eat(INTEGER)
+        return token.value
+
     def expr(self):
-        """expr -> INTEGER PLUS INTEGER"""
         self.current_token = self.get_next_token()
 
-        left = self.current_token
-        self.eat(INTEGER)
+        result = self.term()
+        while self.current_token.type in (PLUS, MINUS):
+            token = self.current_token
+            if token.type == PLUS:
+                self.eat(PLUS)
+                result += self.term()
+            elif token.type == MINUS:
+                self.eat(MINUS)
+                result -= self.term()
 
-        op = self.current_token
-        if op.type == PLUS:
-            self.eat(PLUS)
-        elif op.type == MINUS:
-            self.eat(MINUS)
-        elif op.type == MULTIPLY:
-            self.eat(MULTIPLY)
-        elif op.type == DIVIDE:
-            self.eat(DIVIDE)
-
-        right = self.current_token
-        self.eat(INTEGER)
-
-        if op.type == PLUS:
-            result = left.value + right.value
-        elif op.type == MINUS:
-            result = left.value - right.value
-        elif op.type == MULTIPLY:
-            result = left.value * right.value
-        elif op.type == DIVIDE:
-            result = left.value / right.value
         return result
 
 
