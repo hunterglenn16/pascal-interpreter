@@ -28,6 +28,10 @@ class Interpreter(object):
             self.advance()
         return int(result)
 
+    def skip_whitespace(self):
+        while self.current_char is not None and self.current_char.isspace():
+            self.advance()
+
     def error(self):
         raise Exception("Error parsing input")
 
@@ -39,11 +43,16 @@ class Interpreter(object):
 
     def get_token(self):
         while self.current_char is not None:
+            if self.current_char.isspace():
+                self.skip_whitespace()
+
             if self.current_char.isdigit():
                 return Token(INTEGER, self.integer())
+
             if self.current_char == "+":
                 self.advance()
                 return Token(PLUS, "+")
+
             if self.current_char == "-":
                 self.advance()
                 return Token(MINUS, "-")
@@ -55,12 +64,14 @@ class Interpreter(object):
 
         result = self.current_token.value
         self.eat(INTEGER)
+
         while self.current_token.type in (PLUS, MINUS):
             token = self.current_token
             if token.type == PLUS:
                 self.eat(PLUS)
                 result += self.current_token.value
                 self.eat(INTEGER)
+
             if token.type == MINUS:
                 self.eat(MINUS)
                 result -= self.current_token.value
