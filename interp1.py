@@ -41,6 +41,11 @@ class Interpreter(object):
         else:
             self.error()
 
+    def term(self):
+        token = self.current_token
+        self.eat(INTEGER)
+        return token.value
+
     def get_token(self):
         while self.current_char is not None:
             if self.current_char.isspace():
@@ -69,13 +74,11 @@ class Interpreter(object):
             token = self.current_token
             if token.type == PLUS:
                 self.eat(PLUS)
-                result += self.current_token.value
-                self.eat(INTEGER)
+                result += self.term()
 
             if token.type == MINUS:
                 self.eat(MINUS)
-                result -= self.current_token.value
-                self.eat(INTEGER)
+                result -= self.term()
         return result
 
 
