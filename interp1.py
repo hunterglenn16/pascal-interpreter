@@ -1,4 +1,4 @@
-INTEGER, PLUS, MINUS, EOF = "INTEGER", "PLUS", "MINUS", "EOF"
+INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, EOF = "INTEGER", "PLUS", "MINUS", "MULTIPLY", "DIVIDE", "EOF"
 
 
 class Token(object):
@@ -61,6 +61,15 @@ class Interpreter(object):
             if self.current_char == "-":
                 self.advance()
                 return Token(MINUS, "-")
+
+            if self.current_char == "*":
+                self.advance()
+                return Token(MULTIPLY, "*")
+
+            if self.current_char == "/":
+                self.advance()
+                return Token(DIVIDE, "/")
+
             self.error()
         return Token(EOF, None)
 
@@ -79,6 +88,17 @@ class Interpreter(object):
             if token.type == MINUS:
                 self.eat(MINUS)
                 result -= self.term()
+
+        while self.current_token.type in (MULTIPLY, DIVIDE):
+            token = self.current_token
+            if token.type == MULTIPLY:
+                self.eat(MULTIPLY)
+                result *= self.term()
+
+            if token.type == DIVIDE:
+                self.eat(DIVIDE)
+                result /= self.term()
+
         return result
 
 
