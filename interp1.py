@@ -95,7 +95,6 @@ class Interpreter(object):
                 self.eat(MULTIPLY)
                 result *= self.term()
 
-            if token.type == DIVIDE:
                 self.eat(DIVIDE)
                 result /= self.term()
 
