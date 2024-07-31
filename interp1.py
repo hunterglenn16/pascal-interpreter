@@ -76,10 +76,25 @@ class Interpreter(object):
         else:
             self.error()
 
-    def term(self):
+    def factor(self):
         token = self.current_token
         self.eat(INTEGER)
         return token.value
+
+    def term(self):
+        result = self.factor()
+
+        while self.current_token.type in (MULTIPLY, DIVIDE):
+
+            token = self.current_token
+            if token.type == MULTIPLY:
+                self.eat(MULTIPLY)
+                result *= self.factor()
+            if token.type == DIVIDE:
+                self.eat(DIVIDE)
+                result /= self.factor()
+
+        return result
 
     def expr(self):
 
@@ -94,15 +109,6 @@ class Interpreter(object):
             if token.type == MINUS:
                 self.eat(MINUS)
                 result -= self.term()
-
-        while self.current_token.type in (MULTIPLY, DIVIDE):
-            token = self.current_token
-            if token.type == MULTIPLY:
-                self.eat(MULTIPLY)
-                result *= self.term()
-            if token.type == DIVIDE:
-                self.eat(DIVIDE)
-                result /= self.term()
 
         return result
 
