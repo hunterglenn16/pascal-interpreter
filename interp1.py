@@ -1,4 +1,4 @@
-INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, EOF = "INTEGER", "PLUS", "MINUS", "MULTIPLY", "DIVIDE", "EOF"
+INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, LPAR, RPAR, EOF = "INTEGER", "PLUS", "MINUS", "MULTIPLY", "DIVIDE", "LPAR", "RPAR", "EOF"
 
 
 class Token(object):
@@ -58,7 +58,16 @@ class Lexer(object):
                 self.advance()
                 return Token(DIVIDE, "/")
 
+            if self.current_char == "(":
+                self.advance()
+                return Token(LPAR, "(")
+
+            if self.current_char == ")":
+                self.advance()
+                return Token(RPAR, ")")
+
             self.error()
+
         return Token(EOF, None)
 
 
@@ -73,13 +82,20 @@ class Interpreter(object):
     def eat(self, token_type):
         if self.current_token.type == token_type:
             self.current_token = self.lexer.get_token()
+
         else:
             self.error()
 
     def factor(self):
         token = self.current_token
-        self.eat(INTEGER)
-        return token.value
+        if token.type == INTEGER:
+            self.eat(INTEGER)
+            return token.value
+        if token.type == LPAR:
+            self.eat(LPAR)
+            result = self.expr()
+            self.eat(RPAR)
+            return result
 
     def term(self):
         result = self.factor()
