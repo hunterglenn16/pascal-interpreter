@@ -81,7 +81,7 @@ class AST(object):
 class BinOp(AST):
     def __init__(self, left, op, right):
         self.left = left
-        self.token = op
+        self.token = self.op = op
         self.right = right
 
 
@@ -110,7 +110,7 @@ class Parser(object):
         token = self.current_token
         if token.type == INTEGER:
             self.eat(INTEGER)
-            return token.value
+            return Num(token)
         if token.type == LPAR:
             self.eat(LPAR)
             node = self.expr()
@@ -163,11 +163,18 @@ class Interpreter(NodeVisitor):
     def __init__(self, parser):
         self.parser = parser
 
-    def visit_BiOp(self):
-        ...
+    def visit_BinOp(self, node):
+        if node.op.type == PLUS:
+            return self.visit(node.left) + self.visit(node.right)
+        elif node.op.type == MINUS:
+            return self.visit(node.left) - self.visit(node.right)
+        elif node.op.type == MULTIPLY:
+            return self.visit(node.left) * self.visit(node.right)
+        elif node.op.type == DIVIDE:
+            return self.visit(node.left) / self.visit(node.right)
 
-    def visit_Num(self):
-        ...
+    def visit_Num(self, node):
+        return node.value
 
     def interpret(self):
         tree = self.parser.parse()
@@ -185,7 +192,7 @@ def main():
         lexer = Lexer(text)
         parser = Parser(lexer)
         interpreter = Interpreter(parser)
-        result = interpreter.expr()
+        result = interpreter.interpret()
         print(result)
 
 
