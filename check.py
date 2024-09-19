@@ -66,5 +66,15 @@ def main():
     interpreter = Interpreter(Lexer)
 
 
+def function_test(int: num, str: word) -> bool:
+
+    int: num = num
+    str: word = word
+    if len(num) > len(word):
+        return True
+    else:
+        return False
+
+
 if __name__ == "__main__":
     main()
