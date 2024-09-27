@@ -162,6 +162,18 @@ class Parser(object):
     def statement_list(self):
         pass
 
+    def statement(self):
+        pass
+
+    def assignment_statement(self):
+        pass
+
+    def variable(self):
+        pass
+
+    def empty(self):
+        return NoOp
+
     def term(self):
         node = self.factor()
 
