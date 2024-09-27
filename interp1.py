@@ -153,6 +153,15 @@ class Parser(object):
             self.eat(RPAR)
             return node
 
+    def program(self):
+        pass
+
+    def compound_statement(self):
+        pass
+
+    def statement_list(self):
+        pass
+
     def term(self):
         node = self.factor()
 
