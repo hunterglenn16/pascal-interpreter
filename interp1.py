@@ -37,6 +37,13 @@ class Lexer(object):
     def error(self):
         raise Exception("Error parsing input")
 
+    def peek(self):
+        peek_pos = self.pos + 1
+        if peek_pos > len(self.text) - 1:
+            return None
+        else:
+            return self.text[peek_pos]
+
     def get_token(self):
         while self.current_char is not None:
             if self.current_char.isspace():
