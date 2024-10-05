@@ -1,5 +1,5 @@
-BEGIN, END, SEMI, DOT, ID, INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, LPAR, RPAR, EOF = (
-    "BEGIN", "END", "SEMI", "DOT", "ID", "INTEGER", "PLUS", "MINUS", "MULTIPLY", "DIVIDE",
+BEGIN, END, SEMI, DOT, ID, ASSIGN, INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, LPAR, RPAR, EOF = (
+    "BEGIN", "END", "SEMI", "DOT", "ID", "ASSIGN" "INTEGER", "PLUS", "MINUS", "MULTIPLY", "DIVIDE",
     "LPAR", "RPAR", "EOF"
 )
 
@@ -44,6 +44,20 @@ class Lexer(object):
         else:
             return self.text[peek_pos]
 
+    RESERVED_KEYWORDS = {
+        'BEGIN': Token('BEGIN', 'BEGIN'),
+        'END': Token('END', 'END'),
+    }
+
+    def _id(self):
+        result = ''
+        while self.current_char is not None and self.current_char.isalnum():
+            result += self.current_char
+            self.advance()
+
+        token = None
+        return token
+
     def get_token(self):
         while self.current_char is not None:
             if self.current_char.isspace():
@@ -51,6 +65,19 @@ class Lexer(object):
 
             if self.current_char.isdigit():
                 return Token(INTEGER, self.integer())
+
+            if self.current_char == ":" and self.peek == "=":
+                self.advance()
+                self.advance()
+                return Token(ASSIGN, ":=")
+
+            if self.current_char == ";":
+                self.advance()
+                return Token(SEMI, ";")
+
+            if self.current_char == ".":
+                self.advance()
+                return Token(DOT, ".")
 
             if self.current_char == "+":
                 self.advance()
