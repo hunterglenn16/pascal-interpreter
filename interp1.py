@@ -188,22 +188,53 @@ class Parser(object):
             return node
 
     def program(self):
-        pass
+        node = self.compound_statement()
+        self.eat(DOT)
+        return node
 
     def compound_statement(self):
-        pass
+        self.eat(BEGIN)
+        nodes = self.statement_list()
+        self.eat(END)
+
+        root = Compound()
+        for n in nodes:
+            root.children.append(n)
+        return root
 
     def statement_list(self):
-        pass
+        node = self.statement()
+        results = [node]
+
+        while self.current_token.type == SEMI:
+            self.eat(SEMI)
+            results.append(self.statement())
+
+        if self.current_token.type == ID:
+            return self.error()
+        return results
 
     def statement(self):
-        pass
+        if self.current_token.type == BEGIN:
+            node = self.compound_statement()
+        if self.current_token.type == ID:
+            node = self.assignment_statement()
+        else:
+            node = self.empty()
+        return node
 
     def assignment_statement(self):
-        pass
+        left = self.variable()
+        token = self.current_token
+        self.eat(ASSIGN)
+        right = self.expr()
+        node = Assign(left, token, right)
+        return node
 
     def variable(self):
-        pass
+        node = Var(self.current_token)
+        self.eat(ID)
+        return node
 
     def empty(self):
         return NoOp
