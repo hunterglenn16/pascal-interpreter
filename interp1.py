@@ -313,6 +313,13 @@ class Interpreter(NodeVisitor):
         elif op == MINUS:
             return -self.visit(node.expr)
 
+    def visit_Compound(self, node):
+        for child in node.children:
+            self.visit(child)
+
+    def visit_NoOp(self, node):
+        pass
+
     def interpret(self):
         tree = self.parser.parse()
         return self.visit(tree)
