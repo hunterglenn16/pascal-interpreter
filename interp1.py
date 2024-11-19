@@ -1,6 +1,5 @@
 BEGIN, END, SEMI, DOT, ID, ASSIGN, INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, LPAR, RPAR, EOF = (
-    "BEGIN", "END", "SEMI", "DOT", "ID", "ASSIGN" "INTEGER", "PLUS", "MINUS", "MULTIPLY", "DIVIDE",
-    "LPAR", "RPAR", "EOF"
+    "BEGIN", "END", "SEMI", "DOT", "ID", "ASSIGN", "INTEGER", "PLUS", "MINUS", "MULTIPLY", "DIVIDE", "LPAR", "RPAR", "EOF"
 )
 
 
@@ -55,7 +54,7 @@ class Lexer(object):
             result += self.current_char
             self.advance()
 
-        token = None
+        token = self.RESERVED_KEYWORDS.get(result, Token(ID, result))
         return token
 
     def get_token(self):
@@ -63,10 +62,13 @@ class Lexer(object):
             if self.current_char.isspace():
                 self.skip_whitespace()
 
-            if self.current_char.isdigit():
+            if self.current_char is not None and self.current_char.isalpha():
+                return self._id()
+
+            if self.current_char is not None and self.current_char.isdigit():
                 return Token(INTEGER, self.integer())
 
-            if self.current_char == ":" and self.peek == "=":
+            if self.current_char == ":" and self.peek() == "=":
                 self.advance()
                 self.advance()
                 return Token(ASSIGN, ":=")
@@ -241,7 +243,7 @@ class Parser(object):
         return node
 
     def empty(self):
-        return NoOp
+        return NoOp()
 
     def term(self):
         node = self.factor()
@@ -292,6 +294,7 @@ class NodeVisitor(object):
 class Interpreter(NodeVisitor):
     def __init__(self, parser):
         self.parser = parser
+        self.GLOBAL_SCOPE = {}
 
     def visit_BinOp(self, node):
         if node.op.type == PLUS:
@@ -322,7 +325,16 @@ class Interpreter(NodeVisitor):
 
     def visit_Assign(self, node):
         var_name = node.left.value
-        self.GLOBAL_SCOPE[var_name] = self.visit(node.left)
+        self.GLOBAL_SCOPE[var_name] = self.visit(node.right)
+
+    def visit_Var(self, node):
+        var_name = node.value
+        val = self.GLOBAL_SCOPE.get(var_name)
+
+        if val is None:
+            raise NameError(repr(var_name))
+        else:
+            return val
 
     def interpret(self):
         tree = self.parser.parse()
@@ -330,18 +342,13 @@ class Interpreter(NodeVisitor):
 
 
 def main():
-    while True:
-        try:
-            text = input("calc> ")
-        except EOFError:
-            break
-        if not text:
-            continue
-        lexer = Lexer(text)
-        parser = Parser(lexer)
-        interpreter = Interpreter(parser)
-        result = interpreter.interpret()
-        print(result)
+    # TODO: block text throws error, need to check
+    text = "BEGIN x := 11; END."
+    lexer = Lexer(text)
+    parser = Parser(lexer)
+    interpreter = Interpreter(parser)
+    interpreter.interpret()
+    print(interpreter.GLOBAL_SCOPE)
 
 
 if __name__ == "__main__":
