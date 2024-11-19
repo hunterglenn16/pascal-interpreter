@@ -320,6 +320,10 @@ class Interpreter(NodeVisitor):
     def visit_NoOp(self, node):
         pass
 
+    def visit_Assign(self, node):
+        var_name = node.left.value
+        self.GLOBAL_SCOPE[var_name] = self.visit(node.left)
+
     def interpret(self):
         tree = self.parser.parse()
         return self.visit(tree)
