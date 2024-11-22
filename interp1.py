@@ -343,7 +343,16 @@ class Interpreter(NodeVisitor):
 
 def main():
     # TODO: block text throws error, need to check
-    text = "BEGIN x := 11; END."
+    text = """\
+        BEGIN
+            BEGIN
+                number := 2;
+                a := number;
+                b := 10 * a + 10 * number / 4;
+                c := a - - b
+            END;
+            x := 11;
+        END."""
     lexer = Lexer(text)
     parser = Parser(lexer)
     interpreter = Interpreter(parser)
