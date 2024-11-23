@@ -8,6 +8,21 @@ class Token(object):
         self.type = type
         self.value = value
 
+    def __str__(self):
+        return 'Token({type}, {value})'.format(
+            type=self.type,
+            value=repr(self.value)
+        )
+
+    def __repr__(self):
+        return self.__str__()
+
+
+RESERVED_KEYWORDS = {
+    'BEGIN': Token('BEGIN', 'BEGIN'),
+    'END': Token('END', 'END'),
+}
+
 
 class Lexer(object):
     def __init__(self, text):
@@ -43,18 +58,13 @@ class Lexer(object):
         else:
             return self.text[peek_pos]
 
-    RESERVED_KEYWORDS = {
-        'BEGIN': Token('BEGIN', 'BEGIN'),
-        'END': Token('END', 'END'),
-    }
-
     def _id(self):
         result = ''
         while self.current_char is not None and self.current_char.isalnum():
             result += self.current_char
             self.advance()
 
-        token = self.RESERVED_KEYWORDS.get(result, Token(ID, result))
+        token = RESERVED_KEYWORDS.get(result, Token(ID, result))
         return token
 
     def get_token(self):
@@ -223,7 +233,7 @@ class Parser(object):
     def statement(self):
         if self.current_token.type == BEGIN:
             node = self.compound_statement()
-        if self.current_token.type == ID:
+        elif self.current_token.type == ID:
             node = self.assignment_statement()
         else:
             node = self.empty()
@@ -292,9 +302,10 @@ class NodeVisitor(object):
 
 
 class Interpreter(NodeVisitor):
+    GLOBAL_SCOPE = {}
+
     def __init__(self, parser):
         self.parser = parser
-        self.GLOBAL_SCOPE = {}
 
     def visit_BinOp(self, node):
         if node.op.type == PLUS:
@@ -304,7 +315,7 @@ class Interpreter(NodeVisitor):
         elif node.op.type == MULTIPLY:
             return self.visit(node.left) * self.visit(node.right)
         elif node.op.type == DIVIDE:
-            return self.visit(node.left) / self.visit(node.right)
+            return self.visit(node.left) // self.visit(node.right)
 
     def visit_Num(self, node):
         return node.value
@@ -338,6 +349,9 @@ class Interpreter(NodeVisitor):
 
     def interpret(self):
         tree = self.parser.parse()
+        if tree is None:
+            return ''
+
         return self.visit(tree)
 
 
@@ -349,7 +363,7 @@ def main():
                 number := 2;
                 a := number;
                 b := 10 * a + 10 * number / 4;
-                c := a - - b
+                c := a - - b;
             END;
             x := 11;
         END."""
