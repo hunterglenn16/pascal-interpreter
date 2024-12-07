@@ -60,7 +60,7 @@ class Lexer(object):
 
     def _id(self):
         result = ''
-        while self.current_char is not None and self.current_char.isalnum():
+        while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '_'):
             result += self.current_char
             self.advance()
 
@@ -72,7 +72,7 @@ class Lexer(object):
             if self.current_char.isspace():
                 self.skip_whitespace()
 
-            if self.current_char is not None and self.current_char.isalpha():
+            if self.current_char is not None and (self.current_char.isalpha() or self.current_char == "_"):
                 return self._id()
 
             if self.current_char is not None and self.current_char.isdigit():
@@ -356,14 +356,13 @@ class Interpreter(NodeVisitor):
 
 
 def main():
-    # TODO: block text throws error, need to check
     text = """\
         BEGIN
             BEGIN
                 number := 2;
                 a := number;
-                b := 10 * a + 10 * number / 4;
-                c := a - - b;
+                _b := 10 * a + 10 * number / 4;
+                c := a - - _b;
             END;
             x := 11;
         END."""
