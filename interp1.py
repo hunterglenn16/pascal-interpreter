@@ -59,6 +59,11 @@ class Lexer(object):
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
+    def skip_comment(self):
+        while self.current_char != '}':
+            self.advance()
+        self.advance()
+
     def error(self):
         raise Exception("Error parsing input")
 
