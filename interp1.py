@@ -48,12 +48,26 @@ class Lexer(object):
         else:
             self.current_char = self.text[self.pos]
 
-    def integer(self):
+    def number(self):
         result = ""
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self.advance()
-        return int(result)
+
+        if self.current_char == ".":
+            result += self.current_char
+            self.advance()
+
+            while self.current_char is not None and self.current_char.isdigit():
+                result += self.current_char
+                self.advance()
+
+            token = Token('REAL_CONST', float(result))
+
+        else:
+            token = Token('INTEGER_CONST', int(result))
+
+        return token
 
     def skip_whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
@@ -92,7 +106,7 @@ class Lexer(object):
                 return self._id()
 
             if self.current_char is not None and self.current_char.isdigit():
-                return Token(INTEGER, self.integer())
+                return Token(INTEGER, self.number())
 
             if self.current_char == ":" and self.peek() == "=":
                 self.advance()
@@ -138,6 +152,30 @@ class Lexer(object):
 
 class AST(object):
     pass
+
+
+class Program(AST):
+    def __init__(self, name, block):
+        self.name = name
+        self.block = block
+
+
+class Block(AST):
+    def __init__(self, declarations, compound_statement):
+        self.declarations = declarations
+        self.compound_statement = compound_statement
+
+
+class VarDec(AST):
+    def __init__(self, var_node, var_type):
+        self.var_node = var_node
+        self.var_type = var_type
+
+
+class Type(AST):
+    def __init__(self, token):
+        self.token = token
+        self.value = token.value
 
 
 class BinOp(AST):
