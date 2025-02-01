@@ -106,7 +106,7 @@ class Lexer(object):
                 return self._id()
 
             if self.current_char is not None and self.current_char.isdigit():
-                return Token(INTEGER, self.number())
+                return self.number()
 
             if self.current_char == ":" and self.peek() == "=":
                 self.advance()
@@ -262,6 +262,52 @@ class Parser(object):
         self.eat(DOT)
         return node
 
+    def block(self):
+        declaration_nodes = self.declarations()
+        compound_statement_nodes = self.compound_statement()
+        node = Block(declaration_nodes, compound_statement_nodes)
+        return node
+
+    def declarations(self):
+        declarations = []
+        if self.current_token.type == VAR:
+            self.eat(VAR)
+            while self.current_token.type == ID:
+                var_dec1 = self.variable_declarations()
+                declarations.extend(var_dec1)
+                self.eat(SEMI)
+
+        return declarations
+
+    def variable_declarations(self):
+        var_nodes = [Var(self.current_token)]
+        self.eat(ID)
+
+        while self.current_token.type == COMMA:
+            self.eat(COMMA)
+            var_nodes.append(Var(self.current_token))
+            self.eat(ID)
+
+        self.eat(COLON)
+
+        type_node = self.type_spec()
+        var_declarations = [
+            VarDec(var_node, type_node)
+            for var_node in var_nodes
+        ]
+
+        return var_declarations
+
+    def type_spec(self):
+        token = self.current_token
+        if self.current_token.type == INTEGER:
+            self.eat(INTEGER)
+        else:
+            self.eat(REAL)
+        node = Type(token)
+
+        return node
+
     def compound_statement(self):
         self.eat(BEGIN)
         nodes = self.statement_list()
@@ -412,13 +458,6 @@ class Interpreter(NodeVisitor):
 def main():
     text = """\
         BEGIN
-            BEGIN
-                number := 2;
-                a := number;
-                _b := 10 * a + 10 * number / 4;
-                c := a - - _b;
-            END;
-            x := 11;
         END."""
     lexer = Lexer(text)
     parser = Parser(lexer)
