@@ -244,23 +244,30 @@ class Parser(object):
             self.eat(MINUS)
             node = UnaryOp(token, self.factor())
             return node
-        if token.type == INTEGER:
-            self.eat(INTEGER)
+        elif token.type == INTEGER_CONST:
+            self.eat(INTEGER_CONST)
             return Num(token)
-        if token.type == LPAR:
+        elif token.type == REAL_CONST:
+            self.eat(REAL_CONST)
+            return Num(token)
+        elif token.type == LPAR:
             self.eat(LPAR)
             node = self.expr()
             self.eat(RPAR)
             return node
-
         else:
             node = self.variable()
             return node
 
     def program(self):
-        node = self.compound_statement()
+        self.eat(PROGRAM)
+        var_node = self.variable()
+        program_name = var_node.value
+        self.eat(SEMI)
+        block_node = self.block()
+        program_node = Program(program_name, block_node)
         self.eat(DOT)
-        return node
+        return program_node
 
     def block(self):
         declaration_nodes = self.declarations()
@@ -358,13 +365,15 @@ class Parser(object):
     def term(self):
         node = self.factor()
 
-        while self.current_token.type in (MULTIPLY, DIVIDE):
+        while self.current_token.type in (MULTIPLY, INTEGER_DIV, FLOAT_DIV):
 
             token = self.current_token
             if token.type == MULTIPLY:
                 self.eat(MULTIPLY)
-            if token.type == DIVIDE:
-                self.eat(DIVIDE)
+            elif token.type == INTEGER_DIV:
+                self.eat(INTEGER_DIV)
+            elif token.type == FLOAT_DIV:
+                self.eat(FLOAT_DIV)
 
             node = BinOp(node, token, self.factor())
         return node
@@ -458,6 +467,7 @@ class Interpreter(NodeVisitor):
 def main():
     text = """\
         BEGIN
+            x :=1
         END."""
     lexer = Lexer(text)
     parser = Parser(lexer)
