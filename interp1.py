@@ -27,7 +27,7 @@ class Token(object):
 RESERVED_KEYWORDS = {
     'PROGRAM': Token('PROGRAM', 'PROGRAM'),
     'VAR': Token('VAR', 'VAR'),
-    'DIV': Token('DIV', 'DIV'),
+    'DIV': Token('INTEGER_DIV', 'DIV'),
     'INTEGER': Token('INTEGER', 'INTEGER'),
     'REAL': Token('REAL', 'REAL'),
     'BEGIN': Token('BEGIN', 'BEGIN'),
@@ -108,6 +108,11 @@ class Lexer(object):
             if self.current_char is not None and self.current_char.isdigit():
                 return self.number()
 
+            if self.current_char == '{':
+                self.advance()
+                self.skip_comment()
+                continue
+
             if self.current_char == ":" and self.peek() == "=":
                 self.advance()
                 self.advance()
@@ -120,6 +125,14 @@ class Lexer(object):
             if self.current_char == ".":
                 self.advance()
                 return Token(DOT, ".")
+
+            if self.current_char == ":":
+                self.advance()
+                return Token(COLON, ":")
+
+            if self.current_char == ',':
+                self.advance()
+                return Token(COMMA, ",")
 
             if self.current_char == "+":
                 self.advance()
@@ -135,7 +148,7 @@ class Lexer(object):
 
             if self.current_char == "/":
                 self.advance()
-                return Token(DIVIDE, "/")
+                return Token(FLOAT_DIV, "/")
 
             if self.current_char == "(":
                 self.advance()
@@ -411,10 +424,10 @@ class NodeVisitor(object):
 
 
 class Interpreter(NodeVisitor):
-    GLOBAL_SCOPE = {}
 
     def __init__(self, parser):
         self.parser = parser
+        self.GLOBAL_SCOPE = {}
 
     def visit_Program(self, node):
         self.visit(node.block)
@@ -481,6 +494,7 @@ class Interpreter(NodeVisitor):
 
 
 def main():
+    # TODO: add fucntion to check in a file for code intead of hard-coding
     text = """\
         PROGRAM Part10AST;
         VAR
