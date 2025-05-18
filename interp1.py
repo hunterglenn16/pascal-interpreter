@@ -5,7 +5,7 @@
     "PROGRAM", "BEGIN", "END", "VAR", "SEMI", "COLON",
     "COMMA", "DOT", "ID", "ASSIGN", "INTEGER", "REAL", "INTEGER_CONST", "REAL_CONST",
     "INTEGER_DIV", "FLOAT_DIV",
-    "PLUS", "MINUS", "MULTIPLY", "DIVIDE", "LPAR", "RPAR", "EOF"
+    "PLUS", "MINUS", "MULTIPLY", "LPAR", "RPAR", "EOF"
 )
 
 
