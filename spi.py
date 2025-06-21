@@ -514,6 +514,21 @@ class SymbolTableBuilder(NodeVisitor):
         var_symbol = VarSymbol(var_name, type_symbol)
         self.symbol_table.define(var_symbol)
 
+    def visit_Assign(self, node):
+        var_name = node.left.value
+        var_symbol = self.symbol_table.lookup(var_name)
+        if var_symbol is None:
+            raise NameError(repr(var_name))
+
+        self.visit(node.right)
+
+    def visit_Var(self, node):
+        var_name = node.value
+        var_symbol = self.symbol_table.lookup(var_name)
+
+        if var_symbol is None:
+            raise NameError(repr(var_name))
+
 
 class Interpreter(NodeVisitor):
 
