@@ -1,4 +1,3 @@
-from collections import OrderedDict
 
 (PROGRAM, BEGIN, END, VAR, SEMI, COLON,
     COMMA, DOT, ID, ASSIGN, INTEGER, REAL,
@@ -182,9 +181,9 @@ class Block(AST):
 
 
 class VarDec(AST):
-    def __init__(self, var_node, var_type):
+    def __init__(self, var_node, type_node):
         self.var_node = var_node
-        self.var_type = var_type
+        self.type_node = type_node
 
 
 class Type(AST):
@@ -453,7 +452,7 @@ class VarSymbol(Symbol):
 
 class SymbolTable(object):
     def __init__(self):
-        self._symbols = OrderedDict()
+        self._symbols = {}
         self._init_builtins()
 
     def _init_builtins(self):
@@ -508,7 +507,7 @@ class SymbolTableBuilder(NodeVisitor):
         pass
 
     def visit_VarDec(self, node):
-        type_name = node.type_name.value
+        type_name = node.type_node.value
         type_symbol = self.symbol_table.lookup(type_name)
         var_name = node.var_node.value
         var_symbol = VarSymbol(var_name, type_symbol)
@@ -534,7 +533,7 @@ class Interpreter(NodeVisitor):
 
     def __init__(self, parser):
         self.parser = parser
-        self.GLOBAL_SCOPE = {}
+        self.GLOBAL_MEMORY = {}
 
     def visit_Program(self, node):
         self.visit(node.block)
@@ -581,11 +580,11 @@ class Interpreter(NodeVisitor):
 
     def visit_Assign(self, node):
         var_name = node.left.value
-        self.GLOBAL_SCOPE[var_name] = self.visit(node.right)
+        self.GLOBAL_MEMORY[var_name] = self.visit(node.right)
 
     def visit_Var(self, node):
         var_name = node.value
-        val = self.GLOBAL_SCOPE.get(var_name)
+        val = self.GLOBAL_MEMORY.get(var_name)
 
         if val is None:
             raise NameError(repr(var_name))
@@ -601,23 +600,24 @@ class Interpreter(NodeVisitor):
 
 
 def main():
-    # TODO: add fucntion to check in a file for code intead of hard-coding
-    text = """\
-        PROGRAM Part10AST;
-        VAR
-            a, b : INTEGER;
-            y    : REAL;
+    import sys
+    text = open(sys.argv[1], 'r').read()
 
-        BEGIN {Part10AST}
-            a := 2;
-            b := 10 * a + 10 * a DIV 4;
-            y := 20 / 7 + 3.14;
-        END.  {Part10AST}"""
     lexer = Lexer(text)
     parser = Parser(lexer)
+    tree = parser.parse()
+    symbol_table_builder = SymbolTableBuilder()
+    symbol_table_builder.visit(tree)
+
+    print('symbol table contents:')
+    print(symbol_table_builder.symbol_table)
+
     interpreter = Interpreter(parser)
     interpreter.interpret()
-    print(interpreter.GLOBAL_SCOPE)
+
+    print('Run-time GLOBAL_MEMORY contents:')
+    for k, v in sorted(interpreter.GLOBAL_MEMORY.items()):
+        print('{} = {}'.format(k, v))
 
 
 if __name__ == "__main__":
