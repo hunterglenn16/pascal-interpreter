@@ -100,8 +100,10 @@ class Lexer(object):
 
     def get_token(self):
         while self.current_char is not None:
+
             if self.current_char.isspace():
                 self.skip_whitespace()
+                continue
 
             if self.current_char is not None and (self.current_char.isalpha() or self.current_char == "_"):
                 return self._id()
@@ -514,6 +516,7 @@ class SymbolTableBuilder(NodeVisitor):
         self.symbol_table.define(var_symbol)
 
     def visit_Assign(self, node):
+
         var_name = node.left.value
         var_symbol = self.symbol_table.lookup(var_name)
         if var_symbol is None:
@@ -531,8 +534,8 @@ class SymbolTableBuilder(NodeVisitor):
 
 class Interpreter(NodeVisitor):
 
-    def __init__(self, parser):
-        self.parser = parser
+    def __init__(self, tree):
+        self.tree = tree
         self.GLOBAL_MEMORY = {}
 
     def visit_Program(self, node):
@@ -580,7 +583,8 @@ class Interpreter(NodeVisitor):
 
     def visit_Assign(self, node):
         var_name = node.left.value
-        self.GLOBAL_MEMORY[var_name] = self.visit(node.right)
+        var_value = self.visit(node.right)
+        self.GLOBAL_MEMORY[var_name] = var_value
 
     def visit_Var(self, node):
         var_name = node.value
@@ -592,7 +596,7 @@ class Interpreter(NodeVisitor):
             return val
 
     def interpret(self):
-        tree = self.parser.parse()
+        tree = self.tree
         if tree is None:
             return ''
 
@@ -612,8 +616,8 @@ def main():
     print('symbol table contents:')
     print(symbol_table_builder.symbol_table)
 
-    interpreter = Interpreter(parser)
-    interpreter.interpret()
+    interpreter = Interpreter(tree)
+    result = interpreter.interpret()
 
     print('Run-time GLOBAL_MEMORY contents:')
     for k, v in sorted(interpreter.GLOBAL_MEMORY.items()):
