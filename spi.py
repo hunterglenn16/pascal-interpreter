@@ -621,7 +621,7 @@ def main():
 
     print('Run-time GLOBAL_MEMORY contents:')
     for k, v in sorted(interpreter.GLOBAL_MEMORY.items()):
-        print('{} = {}'.format(k, v))
+        print(f'{k} = {v}')
 
 
 if __name__ == "__main__":
