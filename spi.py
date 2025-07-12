@@ -33,6 +33,7 @@ RESERVED_KEYWORDS = {
     'REAL': Token('REAL', 'REAL'),
     'BEGIN': Token('BEGIN', 'BEGIN'),
     'END': Token('END', 'END'),
+    'PROCEDURE': Token('PROCEDURE', "PROCEDURE")
 }
 
 
@@ -188,6 +189,12 @@ class VarDec(AST):
         self.type_node = type_node
 
 
+class ProcedureDec(AST):
+    def __init__(self, proc_name, block_node):
+        self.proc_name = proc_name
+        self.block_node = block_node
+
+
 class Type(AST):
     def __init__(self, token):
         self.token = token
@@ -299,6 +306,16 @@ class Parser(object):
                 var_dec1 = self.variable_declarations()
                 declarations.extend(var_dec1)
                 self.eat(SEMI)
+
+        while self.current_token.type == PROCEDURE:
+            self.eat(PROCEDURE)
+            proc_name = self.current_token.value
+            self.eat(ID)
+            self.eat(SEMI)
+            block_node = self.block()
+            proc_dec1 = ProcedureDec(proc_name, block_node)
+            declarations.append(proc_dec1)
+            self.eat(SEMI)
 
         return declarations
 
