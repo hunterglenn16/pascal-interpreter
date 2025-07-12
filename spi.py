@@ -464,7 +464,7 @@ class VarSymbol(Symbol):
         super().__init__(name, type)
 
     def __str__(self):
-        return self.name
+        return f'<{self.name}:{self.type}>'
 
     __repr__ = __str__
 
