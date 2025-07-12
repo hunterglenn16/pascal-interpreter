@@ -548,6 +548,9 @@ class SymbolTableBuilder(NodeVisitor):
         if var_symbol is None:
             raise NameError(repr(var_name))
 
+    def visit_ProcedureDec(self, node):
+        pass
+
 
 class Interpreter(NodeVisitor):
 
@@ -611,6 +614,9 @@ class Interpreter(NodeVisitor):
             raise NameError(repr(var_name))
         else:
             return val
+
+    def visit_ProcedureDec(self, node):
+        pass
 
     def interpret(self):
         tree = self.tree
