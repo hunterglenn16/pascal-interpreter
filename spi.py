@@ -447,6 +447,7 @@ class Symbol(object):
     def __init__(self, name, type=None):
         self.name = name
         self.type = type
+        self.catagory = catagory
 
 
 class BuiltinTypeSymbol(Symbol):
@@ -456,15 +457,15 @@ class BuiltinTypeSymbol(Symbol):
     def __str__(self):
         return self.name
 
-    __repr__ = __str__
-
+    def __repr__(self):
+        return f"<{self.__class__.__name__}(name='{self.name}')>"
 
 class VarSymbol(Symbol):
     def __init__(self, name, type):
         super().__init__(name, type)
 
     def __str__(self):
-        return f'<{self.name}:{self.type}>'
+        return f'<{self.class.__name__} (name={self.name}, type={self.type})>'
 
     __repr__ = __str__
 
@@ -472,19 +473,29 @@ class VarSymbol(Symbol):
 class SymbolTable(object):
     def __init__(self):
         self._symbols = {}
-        self._init_builtins()
 
     def _init_builtins(self):
         self.define(BuiltinTypeSymbol('INTEGER'))
         self.define(BuiltinTypeSymbol('REAL'))
 
     def __str__(self):
-        s = 'Symbols: {symbols}'.format(
-            symbols=[value for value in self._symbols.values()])
+        symtab_header = "Symbol Table Contents"
 
+        lines = ['\n', symtab_header, '_'* len(symtab_header)]
+        lines.extend(
+            ('%7s : %r' % (key, value))
+            for key, value in self._symbols.items()
+
+        )
+        lines.append('\n')
+        string_list = join(lines)
         return s
 
     __repr__ = __str__
+
+    def insert(self, symbol):
+        print(f"Insert: {symbol.name}")
+        self._symbols[symbol.name] = symbol
 
     def define(self, symbol):
         print(f'Define: {symbol}')
