@@ -344,8 +344,8 @@ class Parser(object):
             self.eat(INTEGER)
         else:
             self.eat(REAL)
-        node = Type(token)
 
+        node = Type(token)
         return node
 
     def compound_statement(self):
@@ -444,10 +444,9 @@ class NodeVisitor(object):
 
 
 class Symbol(object):
-    def __init__(self, name, type=None):
+    def __init__(self, name, type = None):
         self.name = name
         self.type = type
-        self.catagory = catagory
 
 
 class BuiltinTypeSymbol(Symbol):
@@ -465,7 +464,7 @@ class VarSymbol(Symbol):
         super().__init__(name, type)
 
     def __str__(self):
-        return f'<{self.class.__name__} (name={self.name}, type={self.type})>'
+        return f'<{self.__class__.__name__} (name={self.name}, type={self.type})>'
 
     __repr__ = __str__
 
@@ -473,32 +472,29 @@ class VarSymbol(Symbol):
 class SymbolTable(object):
     def __init__(self):
         self._symbols = {}
+        self._init_builtins()
 
     def _init_builtins(self):
-        self.define(BuiltinTypeSymbol('INTEGER'))
-        self.define(BuiltinTypeSymbol('REAL'))
+        self.insert(BuiltinTypeSymbol('INTEGER'))
+        self.insert(BuiltinTypeSymbol('REAL'))
 
     def __str__(self):
         symtab_header = "Symbol Table Contents"
 
-        lines = ['\n', symtab_header, '_'* len(symtab_header)]
+        lines = ['\n', symtab_header, "\n", '_'* len(symtab_header),'\n']
         lines.extend(
             ('%7s : %r' % (key, value))
             for key, value in self._symbols.items()
 
         )
         lines.append('\n')
-        string_list = join(lines)
-        return s
+        string_list = '\n'.join(lines)
+        return string_list
 
     __repr__ = __str__
 
     def insert(self, symbol):
         print(f"Insert: {symbol.name}")
-        self._symbols[symbol.name] = symbol
-
-    def define(self, symbol):
-        print(f'Define: {symbol}')
         self._symbols[symbol.name] = symbol
 
     def lookup(self, name):
@@ -540,11 +536,15 @@ class SymbolTableBuilder(NodeVisitor):
         type_name = node.type_node.value
         type_symbol = self.symbol_table.lookup(type_name)
         var_name = node.var_node.value
+
         var_symbol = VarSymbol(var_name, type_symbol)
-        self.symbol_table.define(var_symbol)
+
+        if self.symbol_table.lookup(var_name) is not None:
+            raise ValueError(f"Error: duplicate identifier: {var_name}")
+
+        self.symbol_table.insert(var_symbol)
 
     def visit_Assign(self, node):
-
         var_name = node.left.value
         var_symbol = self.symbol_table.lookup(var_name)
         if var_symbol is None:
@@ -557,7 +557,7 @@ class SymbolTableBuilder(NodeVisitor):
         var_symbol = self.symbol_table.lookup(var_name)
 
         if var_symbol is None:
-            raise NameError(repr(var_name))
+            raise NameError(f"Error: Symbol not found {var_name}")
 
     def visit_ProcedureDec(self, node):
         pass
@@ -578,7 +578,7 @@ class Interpreter(NodeVisitor):
         self.visit(node.compound_statement)
 
     def visit_VarDec(self, node):
-        pass
+       pass 
 
     def visit_Type(self, node):
         pass
