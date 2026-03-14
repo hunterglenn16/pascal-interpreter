@@ -4,7 +4,7 @@ VAR
 
 PROCEDURE P1;
 VAR
-   a : REAL;
+   a, b : REAL;
    k : INTEGER;
 
    PROCEDURE P2;
@@ -20,4 +20,5 @@ END;  {P1}
 
 BEGIN {Part12}
    a := 10;
+   b := 2
 END.  {Part12}

@@ -535,12 +535,9 @@ class SymbolTableBuilder(NodeVisitor):
     def visit_VarDec(self, node):
         type_name = node.type_node.value
         type_symbol = self.symbol_table.lookup(type_name)
+
         var_name = node.var_node.value
-
         var_symbol = VarSymbol(var_name, type_symbol)
-
-        if self.symbol_table.lookup(var_name) is not None:
-            raise ValueError(f"Error: duplicate identifier: {var_name}")
 
         self.symbol_table.insert(var_symbol)
 
