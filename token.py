@@ -1,0 +1,27 @@
+from enum import Enum
+
+
+class TokenType(Enum):
+    PROGRAM = "PROGRAM"
+    BEGIN = "BEGIN"
+    END = "END"
+    SEMI = "SEMI"
+    COLON = "COLON"
+    COMMA = "COMMA"
+    DOT = "DOT"
+    ID = "ID"
+    ASSIGN = "ASSIGN"
+    INTEGER = "INTEGER"
+    REAL = "REAL"
+    INTEGER_CONST = "INTEGER_CONST"
+    REAL_CONST = "REAL_CONST"
+    INTEGER_DIV = "INTEGER_DIV"
+    FLOAT_DIV = "FLOAT_DIV"
+    PLUS = "PLUS"
+    MINUS = "MINUS"
+    MULTIPLY = "MULTIPLY"
+    DIVIDE = "DIVIDE"
+    LPAR = "LPAR"
+    RPAR = "RPAR"
+    EOF = "EOF"
+    PROCEDURE = "PROCEDURE"
