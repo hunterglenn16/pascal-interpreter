@@ -18,14 +18,14 @@ class Token(object):
 
 
 RESERVED_KEYWORDS = {
-    'PROGRAM': Token('PROGRAM', 'PROGRAM'),
-    'VAR': Token('VAR', 'VAR'),
-    'DIV': Token('INTEGER_DIV', 'DIV'),
-    'INTEGER': Token('INTEGER', 'INTEGER'),
-    'REAL': Token('REAL', 'REAL'),
-    'BEGIN': Token('BEGIN', 'BEGIN'),
-    'END': Token('END', 'END'),
-    'PROCEDURE': Token('PROCEDURE', "PROCEDURE")
+    'PROGRAM': Token(TokenType.PROGRAM, 'PROGRAM'),
+    'VAR': Token(TokenType.VAR, 'VAR'),
+    'DIV': Token(TokenType.INTEGER_DIV, 'DIV'),
+    'INTEGER': Token(TokenType.INTEGER, 'INTEGER'),
+    'REAL': Token(TokenType.REAL, 'REAL'),
+    'BEGIN': Token(TokenType.BEGIN, 'BEGIN'),
+    'END': Token(TokenType.END, 'END'),
+    'PROCEDURE': Token(TokenType.PROCEDURE, "PROCEDURE")
 }
 
 
@@ -87,8 +87,8 @@ class Lexer(object):
         while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '_'):
             result += self.current_char
             self.advance()
-
-        token = RESERVED_KEYWORDS.get(result, Token(TokenType.ID, result))
+        
+        token = RESERVED_KEYWORDS.get(result.upper(), Token(TokenType.ID, result))
         return token
 
     def get_token(self):

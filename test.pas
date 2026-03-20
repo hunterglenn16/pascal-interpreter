@@ -1,24 +1,7 @@
-PROGRAM Part12;
-VAR
-   a : INTEGER;
 
-PROCEDURE P1;
-VAR
-   a, b : REAL;
-   k : INTEGER;
+program SymTab3;
+   var x, y : integer;
 
-   PROCEDURE P2;
-   VAR
-      a, z : INTEGER;
-   BEGIN {P2}
-      z := 777;
-   END;  {P2}
+begin
 
-BEGIN {P1}
-
-END;  {P1}
-
-BEGIN {Part12}
-   a := 10;
-   b := 2
-END.  {Part12}
+end.

@@ -10,6 +10,7 @@ class TokenType(Enum):
     COMMA = "COMMA"
     DOT = "DOT"
     ID = "ID"
+    VAR = "VAR"
     ASSIGN = "ASSIGN"
     INTEGER = "INTEGER"
     REAL = "REAL"
