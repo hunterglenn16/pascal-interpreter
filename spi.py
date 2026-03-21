@@ -635,18 +635,14 @@ def main():
     parser = Parser(lexer)
     tree = parser.parse()
     symbol_table_builder = SymbolTableBuilder()
-    symbol_table_builder.visit(tree)
 
-    print('symbol table contents:')
+    try:
+        symbol_table_builder.visit(tree)
+    except Exception as e:
+        print(e)
     print(symbol_table_builder.symbol_table)
-
-    interpreter = Interpreter(tree)
-    result = interpreter.interpret()
-
-    print('Run-time GLOBAL_MEMORY contents:')
-    for k, v in sorted(interpreter.GLOBAL_MEMORY.items()):
-        print(f'{k} = {v}')
-
+    # interpreter = Interpreter(tree)
+    # result = interpreter.interpret()
 
 if __name__ == "__main__":
     main()
