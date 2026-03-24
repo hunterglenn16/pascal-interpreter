@@ -462,24 +462,34 @@ class VarSymbol(Symbol):
     __repr__ = __str__
 
 
-class SymbolTable(object):
-    def __init__(self):
+class ScopedSymbolTable(object):
+    def __init__(self, scope_name, scope_level):
         self._symbols = {}
         self._init_builtins()
+        self.scope_name = scope_name
+        self.scope_level = scope_level
 
     def _init_builtins(self):
         self.insert(BuiltinTypeSymbol('INTEGER'))
         self.insert(BuiltinTypeSymbol('REAL'))
 
     def __str__(self):
-        symtab_header = "Symbol Table Contents"
+        scope_header = "Symbol Table Scope"
+        lines = ['\n', scope_header, "\n", '_' * len(scope_header), '\n']
+        for header_name, header_value in(
+            ('Scope name', self.scope_name),
+            ('Scope level', self.scope_level)
+        ):
+            lines.extend(f"{header_name:-15}: {header_value} ")
 
-        lines = ['\n', symtab_header, "\n", '_' * len(symtab_header), '\n']
+        symtab_header = "Symbol Table Contents"
+        lines.extend(['\n', symtab_header, "\n", '_' * len(symtab_header), '\n'])
         lines.extend(
             ('%7s : %r' % (key, value))
             for key, value in self._symbols.items()
 
         )
+        
         lines.append('\n')
         string_list = '\n'.join(lines)
         return string_list
