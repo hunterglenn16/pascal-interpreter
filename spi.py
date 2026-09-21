@@ -193,6 +193,12 @@ class Type(AST):
         self.value = token.value
 
 
+class Param(AST):
+    def __init__(self, var_node, type_node):
+        self. var_node = var_node 
+        self.type_node = type_node
+
+
 class BinOp(AST):
     def __init__(self, left, op, right):
         self.left = left
@@ -475,15 +481,15 @@ class ScopedSymbolTable(object):
 
     def __str__(self):
         scope_header = "Symbol Table Scope"
-        lines = ['\n', scope_header, "\n", '_' * len(scope_header), '\n']
+        lines = ['\n', scope_header, '_' * len(scope_header)]
         for header_name, header_value in(
             ('Scope name', self.scope_name),
             ('Scope level', self.scope_level)
         ):
-            lines.extend(f"{header_name:-15}: {header_value} ")
+            lines.append(f"{header_name}: {header_value} ")
 
         symtab_header = "Symbol Table Contents"
-        lines.extend(['\n', symtab_header, "\n", '_' * len(symtab_header), '\n'])
+        lines.extend(['\n', symtab_header, '_' * len(symtab_header), '\n'])
         lines.extend(
             ('%7s : %r' % (key, value))
             for key, value in self._symbols.items()
@@ -508,7 +514,7 @@ class ScopedSymbolTable(object):
 
 class SymbolTableBuilder(NodeVisitor):
     def __init__(self):
-        self.symbol_table = SymbolTable()
+        self.scope = ScopedSymbolTable(scope_name = "global", scope_level = 1)
 
     def visit_Block(self, node):
         for declaration in node.declarations:
@@ -537,16 +543,16 @@ class SymbolTableBuilder(NodeVisitor):
 
     def visit_VarDec(self, node):
         type_name = node.type_node.value
-        type_symbol = self.symbol_table.lookup(type_name)
+        type_symbol = self.scope.lookup(type_name)
 
         var_name = node.var_node.value
         var_symbol = VarSymbol(var_name, type_symbol)
 
-        self.symbol_table.insert(var_symbol)
+        self.scope.insert(var_symbol)
 
     def visit_Assign(self, node):
         var_name = node.left.value
-        var_symbol = self.symbol_table.lookup(var_name)
+        var_symbol = self.scope.lookup(var_name)
         if var_symbol is None:
             raise NameError(repr(var_name))
 
@@ -554,7 +560,7 @@ class SymbolTableBuilder(NodeVisitor):
 
     def visit_Var(self, node):
         var_name = node.value
-        var_symbol = self.symbol_table.lookup(var_name)
+        var_symbol = self.scope.lookup(var_name)
 
         if var_symbol is None:
             raise NameError(f"Error: Symbol not found {var_name}")
@@ -650,7 +656,7 @@ def main():
         symbol_table_builder.visit(tree)
     except Exception as e:
         print(e)
-    print(symbol_table_builder.symbol_table)
+    print(symbol_table_builder.scope)
     # interpreter = Interpreter(tree)
     # result = interpreter.interpret()
 
