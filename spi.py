@@ -185,6 +185,15 @@ class ProcedureDec(AST):
     def __init__(self, proc_name, block_node):
         self.proc_name = proc_name
         self.block_node = block_node
+    
+    def declarations(self):
+        ...
+    
+    def formal_parameter_list(self):
+        ...
+
+    def formal_parameters(self):
+        ...
 
 
 class Type(AST):
@@ -446,6 +455,15 @@ class Symbol(object):
         self.name = name
         self.type = type
 
+
+class ProcedureSymbol(Symbol):
+    def __init__(self, name, param=None):
+        super(ProcedureSymbol,self).__init__(name)
+
+    def __str__(self):
+        return f'<{self.__class__.__name__} (name = {name}, parameters = {param})>'
+
+    __repr__ = __str__
 
 class BuiltinTypeSymbol(Symbol):
     def __init__(self, name):
