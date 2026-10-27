@@ -457,8 +457,9 @@ class Symbol(object):
 
 
 class ProcedureSymbol(Symbol):
-    def __init__(self, name, param=None):
+    def __init__(self, name, params=None):
         super(ProcedureSymbol,self).__init__(name)
+        self.params = params if params is not None else []
 
     def __str__(self):
         return f'<{self.__class__.__name__} (name = {name}, parameters = {param})>'
@@ -594,7 +595,18 @@ class Interpreter(NodeVisitor):
         self.GLOBAL_MEMORY = {}
 
     def visit_Program(self, node):
+        print('ENTER scope: global')
+        global_scope = ScopedSymbolTable(
+            scope_name = "global",
+            scope_level = 1
+        )
+
+        self.current_scrope = global_scope
+
         self.visit(node.block)
+
+        print(global_scope)
+        print('LEAVE scope: global')
 
     def visit_Block(self, node):
         for declaration in node.declarations:
